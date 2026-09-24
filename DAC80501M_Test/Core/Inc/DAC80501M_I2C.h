@@ -1,8 +1,7 @@
 /*
- * DAC80501M_I2C.H
- *
- *  Created on: Sep 9, 2026
- *      Author: SRIVATHSJAYAN
+ *  @file DAC80501M_I2C.h
+ *  @date 09 Sep 2026
+ * 	@author: SRIVATHSJAYAN
  */
 
 #ifndef INC_DAC80501M_I2C_H_
@@ -40,19 +39,19 @@ typedef struct
 } DAC80501M_Handle_t;
 
 //@dac_sync
-#define DAC80501M_SYNC_DI 0
-#define DAC80501M_SYNC_EN 1
+#define DAC80501M_SYNC_DI 0U
+#define DAC80501M_SYNC_EN 1U
 
 //@int_ref
-#define DAC80501M_INT_REF_EN 0
-#define DAC80501M_INT_REF_DI 1
+#define DAC80501M_INT_REF_EN 0U
+#define DAC80501M_INT_REF_DI 1U
 
 //
-#define DAC80501M_BUFF_GAIN_1 0
-#define DAC80501M_BUFF_GAIN_2 1
+#define DAC80501M_BUFF_GAIN_1 0U
+#define DAC80501M_BUFF_GAIN_2 1U
 
-#define DAC80501M_REF_DIV_1 0
-#define DAC80501M_REF_DIV_2 1
+#define DAC80501M_REF_DIV_1 0U
+#define DAC80501M_REF_DIV_2 1U
 
 #define __DAC80501M_SYNC_EN_POS            0x00U
 #define __DAC80501M_REF_PWDWN_POS          0x08U

@@ -1,8 +1,7 @@
 /*
- * DAC80501M_I2C.c
- *
- *  Created on: Sep 9, 2026
- *      Author: SRIVATHSJAYAN
+ *  @file DAC80501M_I2C.c
+ *  @date 09 Sep 2026
+ * 	@author: SRIVATHSJAYAN
  */
 #include "DAC80501M_I2C.h"
 
@@ -55,9 +54,9 @@ HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
 	{
 		return status;
 	}
-	if(DAC80501M_Get_Ref_Alarm(hdac) == 1 || DAC80501M_Get_Ref_Alarm(hdac) == 0x99)
+	if(DAC80501M_Get_Ref_Alarm(hdac) == 1U || DAC80501M_Get_Ref_Alarm(hdac) == 0x99U)
 	{
-		return 0x99;
+		return 0x99U;
 	}
 	else
 	{
@@ -86,20 +85,18 @@ HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C transmission timed out.
  */
-static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac,DAC80501M_Register_t Reg,uint16_t Data)
+static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac, DAC80501M_Register_t Reg, uint16_t Data)
 {
 	if(hdac == NULL ||
 			hdac->hi2c == NULL ||
-			hdac->Init.dev_i2c_addr == 0 ||
-			Reg > DAC80501M_REG_DAC_DATA ||
-			Reg < DAC80501M_REG_DEVID)
+			hdac->Init.dev_i2c_addr == 0)
 	{
 		return HAL_ERROR;
 	}
 	uint8_t tx_buff[2];
-	tx_buff[0] = (uint8_t)(Data>>8);
+	tx_buff[0] = (uint8_t)(Data>>8U);
 	tx_buff[1] = (uint8_t)Data;
-	return HAL_I2C_Mem_Write(hdac->hi2c, hdac->Init.dev_i2c_addr, Reg, 1, tx_buff, 2, 1000);
+	return HAL_I2C_Mem_Write(hdac->hi2c, hdac->Init.dev_i2c_addr, Reg, 1U, tx_buff, 2U, 1000);
 }
 /**
  * @brief  Reads a 16-bit register from the DAC80501M over I2C.
@@ -120,7 +117,7 @@ static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac,DAC80501M_R
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C read operation timed out.
  */
-HAL_StatusTypeDef DAC80501M_ReadReg(DAC80501M_Handle_t *hdac,DAC80501M_Register_t Reg,uint16_t *pData)
+HAL_StatusTypeDef DAC80501M_ReadReg(DAC80501M_Handle_t *hdac, DAC80501M_Register_t Reg, uint16_t *pData)
 {
 	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0 || pData == NULL)
 	{
@@ -128,13 +125,13 @@ HAL_StatusTypeDef DAC80501M_ReadReg(DAC80501M_Handle_t *hdac,DAC80501M_Register_
 	}
 	HAL_StatusTypeDef status;
 	uint8_t rx_buff[2];
-	status = HAL_I2C_Mem_Read(hdac->hi2c,hdac->Init.dev_i2c_addr,Reg,1,rx_buff,2, HAL_MAX_DELAY);
+	status = HAL_I2C_Mem_Read(hdac->hi2c,hdac->Init.dev_i2c_addr,Reg,1U,rx_buff,2U, HAL_MAX_DELAY);
 	if(status != HAL_OK)
 	{
 		return status;
 	}
 
-	*pData = ((uint16_t)rx_buff[0] << 8 | rx_buff[1]);
+	*pData = ((uint16_t)rx_buff[0] << 8U | (uint16_t)rx_buff[1]);
 
 	return status;
 }
@@ -155,14 +152,14 @@ uint8_t DAC80501M_Get_Ref_Alarm(DAC80501M_Handle_t *hdac)
 {
 	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
 	{
-		return 0x99;
+		return 0x99U;
 	}
 	HAL_StatusTypeDef status;
 	uint16_t data;
 	status = DAC80501M_ReadReg(hdac, DAC80501M_REG_STATUS, &data);
 	if(status != HAL_OK)
 	{
-		return 0x99;
+		return 0x99U;
 	}
 	return (data & 0x01U);
 }
@@ -320,14 +317,14 @@ HAL_StatusTypeDef DAC80501M_Trigger_LADC(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C transmission timed out.
  */
-HAL_StatusTypeDef DAC80501M_I2C_Write_DAC(DAC80501M_Handle_t *hdac,uint16_t Data)
+HAL_StatusTypeDef DAC80501M_I2C_Write_DAC(DAC80501M_Handle_t *hdac, uint16_t Data)
 {
 	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
 	{
 		return HAL_ERROR;
 	}
 	uint8_t tx_buff[2];
-	tx_buff[0] = (uint8_t)(Data>>8);
+	tx_buff[0] = (uint8_t)(Data>>8U);
 	tx_buff[1] = (uint8_t)Data;
-	return HAL_I2C_Mem_Write(hdac->hi2c, hdac->Init.dev_i2c_addr, DAC80501M_REG_DAC_DATA, 1, tx_buff, 2, HAL_MAX_DELAY);
+	return HAL_I2C_Mem_Write(hdac->hi2c, hdac->Init.dev_i2c_addr, DAC80501M_REG_DAC_DATA, 1U, tx_buff, 2U, HAL_MAX_DELAY);
 }

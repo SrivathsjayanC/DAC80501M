@@ -116,20 +116,19 @@ HAL_StatusTypeDef DAC80501M_Soft_Reset(DAC80501M_Handle_t *hdac)
  */
 static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac,DAC80501M_Register_t Reg,uint16_t Data)
 {
-	if(hdac == NULL || hdac->hspi == NULL || hdac->CS_Port == NULL ||
-			Reg > DAC80501M_REG_DAC_DATA || Reg < DAC80501M_REG_DEVID)
+	if(Reg > DAC80501M_REG_DAC_DATA || Reg < DAC80501M_REG_DEVID)
 	{
 		return HAL_ERROR;
 	}
 	HAL_StatusTypeDef status;
 	uint8_t tx_buff[3];
 	tx_buff[0] = (uint8_t)Reg;
-	tx_buff[1] = (uint8_t)(Data>>8);
+	tx_buff[1] = (uint8_t)(Data>>8U);
 	tx_buff[2] = (uint8_t)Data;
 
-	hdac->CS_Port->BSRR = ((uint32_t)hdac->CS_Pin << 16);
+	hdac->CS_Port->BSRR = ((uint32_t)hdac->CS_Pin << 16U);
 
-	status = HAL_SPI_Transmit(hdac->hspi,tx_buff, 3, HAL_MAX_DELAY);
+	status = HAL_SPI_Transmit(hdac->hspi,tx_buff, 3U, HAL_MAX_DELAY);
 
 	hdac->CS_Port->BSRR = ((uint32_t)hdac->CS_Pin);
 
