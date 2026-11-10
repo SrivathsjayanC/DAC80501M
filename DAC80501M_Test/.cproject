@@ -73,10 +73,13 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.1979632217" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.614330751.1351702184" name="DAC80501M_SPI.c" rcbsApplicability="disable" resourcePath="Core/Src/DAC80501M_SPI.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2141015751.640948198">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2141015751.640948198" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2141015751"/>
+					</fileInfo>
 					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.614330751.1411376396" name="DAC80501M_I2C.h" rcbsApplicability="disable" resourcePath="Core/Inc/DAC80501M_I2C.h" toolsToInvoke=""/>
 					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.614330751.338720782" name="DAC80501M_SPI.h" rcbsApplicability="disable" resourcePath="Core/Inc/DAC80501M_SPI.h" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="Inc/DAC80501M_SPI.h|Src/DAC80501M_SPI.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="Src/DAC80501M_I2C.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 					</sourceEntries>
 				</configuration>

@@ -9,17 +9,18 @@
 #define INC_DAC80501M_SPI_H_
 
 #include "main.h"
+#include "delay_us.h"
 
 typedef enum
 {
-	DAC80501M_REG_NOOP     = 0x00U,
-	DAC80501M_REG_DEVID    = 0x01U,
-	DAC80501M_REG_SYNC     = 0x02U,
-	DAC80501M_REG_CONFIG   = 0x03U,
-	DAC80501M_REG_GAIN     = 0x04U,
-	DAC80501M_REG_TRIGGER  = 0x05U,
-	DAC80501M_REG_STATUS   = 0x07U,
-	DAC80501M_REG_DAC_DATA = 0x08U
+	DAC80501M_REG_NOOP     = 0x00,
+	DAC80501M_REG_DEVID    = 0x01,
+	DAC80501M_REG_SYNC     = 0x02,
+	DAC80501M_REG_CONFIG   = 0x03,
+	DAC80501M_REG_GAIN     = 0x04,
+	DAC80501M_REG_TRIGGER  = 0x05,
+	DAC80501M_REG_STATUS   = 0x07,
+	DAC80501M_REG_DAC_DATA = 0x08
 
 } DAC80501M_Register_t;
 
@@ -34,11 +35,9 @@ typedef struct
 
 typedef struct
 {
-	SPI_HandleTypeDef *hspi;
-
-	GPIO_TypeDef *CS_Port;
-	uint16_t CS_Pin;
-
+	SPI_HandleTypeDef     * hspi;
+	GPIO_TypeDef          * CS_Port;
+	uint16_t                CS_Pin;
 	DAC80501M_InitTypeDef_t Init;
 
 } DAC80501M_Handle_t;
@@ -70,8 +69,8 @@ typedef struct
 #define __DAC80501_TRIGGER_SOFTWARE_RESET    0x000AU
 #define __DAC80501_TRIGGER_LDAC              0x0001U
 
-HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac);
-HAL_StatusTypeDef DAC80501M_Soft_Reset(DAC80501M_Handle_t *hdac);
-HAL_StatusTypeDef DAC80501M_SPI_Write_DAC(DAC80501M_Handle_t *hdac,uint16_t Data);
-HAL_StatusTypeDef DAC80501M_Trigger_LADC(DAC80501M_Handle_t *hdac);
+HAL_StatusTypeDef DAC80501M_Init (DAC80501M_Handle_t * hdac);
+HAL_StatusTypeDef DAC80501M_Soft_Reset (DAC80501M_Handle_t * hdac);
+HAL_StatusTypeDef DAC80501M_SPI_Write_DAC (DAC80501M_Handle_t * hdac, uint16_t Data);
+HAL_StatusTypeDef DAC80501M_Trigger_LADC (DAC80501M_Handle_t * hdac);
 #endif /* INC_DAC80501M_SPI_H_ */

@@ -6,7 +6,7 @@
  */
 #include "DAC80501M_SPI.h"
 
-static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac,DAC80501M_Register_t Reg,uint16_t Data);
+static HAL_StatusTypeDef DAC80501M_WriteReg (DAC80501M_Handle_t * hdac, DAC80501M_Register_t Reg, uint16_t Data);
 /**
  * @brief  Initializes the DAC80501M device over SPI based on the handle configuration.
  * @details Validates the handle pointers and initialization parameters, then transmits
@@ -22,16 +22,16 @@ static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac,DAC80501M_R
  * @retval HAL_BUSY     The SPI peripheral is currently busy.
  * @retval HAL_TIMEOUT  The SPI transmission timed out.
  */
-HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
+HAL_StatusTypeDef DAC80501M_Init (DAC80501M_Handle_t * hdac)
 {
-	if(hdac == NULL || hdac->hspi == NULL || hdac->CS_Port == NULL)
+	if((hdac == NULL) || (hdac->hspi == NULL) || (hdac->CS_Port == NULL))
 	{
 		return HAL_ERROR;
 	}
-	if(hdac->Init.int_ref > DAC80501M_INT_REF_DI ||
-			hdac->Init.dac_sync > DAC80501M_SYNC_EN ||
-			hdac->Init.buff_gain > DAC80501M_BUFF_GAIN_2 ||
-			hdac->Init.ref_div > DAC80501M_REF_DIV_2)
+	if((hdac->Init.int_ref > DAC80501M_INT_REF_DI) ||
+			(hdac->Init.dac_sync > DAC80501M_SYNC_EN) ||
+			(hdac->Init.buff_gain > DAC80501M_BUFF_GAIN_2) ||
+			(hdac->Init.ref_div > DAC80501M_REF_DIV_2))
 	{
 		return HAL_ERROR;
 	}
@@ -42,7 +42,7 @@ HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
 		cfg_reg |= (uint16_t)(0x01U << __DAC80501M_SYNC_EN_POS);
 	}
 
-	status = DAC80501M_WriteReg(hdac,DAC80501M_REG_SYNC, cfg_reg);
+	status = DAC80501M_WriteReg(hdac, DAC80501M_REG_SYNC, cfg_reg);
 	if(status != HAL_OK)
 	{
 		return status;
@@ -53,7 +53,7 @@ HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
 	{
 		cfg_reg |= (uint16_t)(0x01U << __DAC80501M_REF_PWDWN_POS);
 	}
-	status = DAC80501M_WriteReg(hdac,DAC80501M_REG_CONFIG, cfg_reg);
+	status = DAC80501M_WriteReg(hdac, DAC80501M_REG_CONFIG, cfg_reg);
 	if(status != HAL_OK)
 	{
 		return status;
@@ -68,7 +68,7 @@ HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
 	{
 		cfg_reg |= (0x01U << __DAC80501M_REF_DIV_POS);
 	}
-	status = DAC80501M_WriteReg(hdac,DAC80501M_REG_GAIN, cfg_reg);
+	status = DAC80501M_WriteReg(hdac, DAC80501M_REG_GAIN, cfg_reg);
 
 	return status;
 }
@@ -86,9 +86,9 @@ HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The SPI peripheral is currently busy.
  * @retval HAL_TIMEOUT  The SPI transmission timed out.
  */
-HAL_StatusTypeDef DAC80501M_Soft_Reset(DAC80501M_Handle_t *hdac)
+HAL_StatusTypeDef DAC80501M_Soft_Reset (DAC80501M_Handle_t * hdac)
 {
-	if(hdac == NULL || hdac->hspi == NULL || hdac->CS_Port == NULL)
+	if((hdac == NULL) || (hdac->hspi == NULL) || (hdac->CS_Port == NULL))
 	{
 		return HAL_ERROR;
 	}
@@ -99,9 +99,10 @@ HAL_StatusTypeDef DAC80501M_Soft_Reset(DAC80501M_Handle_t *hdac)
  * @brief  Writes a 24-bit frame to a specified DAC80501M register over SPI.
  * @details Validates input arguments, formats a 3-byte payload comprising the 8-bit
  *          register address followed by the 16-bit data word (transmitted MSB-first),
- *          and asserts the Chip Select (SYNC) line low to transmit the frame over SPI.
- *          The CS line is de-asserted high immediately following transmission to latch
- *          the data into the device.
+ *          and asserts the Chip Select (SYNC) line low. A 1-microsecond delay is
+ *          executed before and after the SPI transmission to guarantee hardware setup
+ *          and hold timing requirements before the CS line is de-asserted high to
+ *          latch the data into the device.
  *
  * @param[in] hdac Pointer to the DAC80501M handle structure containing the SPI instance
  *                 and Chip Select (SYNC) pin configuration.
@@ -114,21 +115,22 @@ HAL_StatusTypeDef DAC80501M_Soft_Reset(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The SPI peripheral is currently busy.
  * @retval HAL_TIMEOUT  The SPI transmission timed out.
  */
-static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac,DAC80501M_Register_t Reg,uint16_t Data)
+static HAL_StatusTypeDef DAC80501M_WriteReg (DAC80501M_Handle_t * hdac, DAC80501M_Register_t Reg, uint16_t Data)
 {
-	if(Reg > DAC80501M_REG_DAC_DATA || Reg < DAC80501M_REG_DEVID)
+	if((Reg > DAC80501M_REG_DAC_DATA) || (Reg < DAC80501M_REG_DEVID))
 	{
 		return HAL_ERROR;
 	}
 	HAL_StatusTypeDef status;
 	uint8_t tx_buff[3];
 	tx_buff[0] = (uint8_t)Reg;
-	tx_buff[1] = (uint8_t)(Data>>8U);
+	tx_buff[1] = (uint8_t)(Data >> 8U);
 	tx_buff[2] = (uint8_t)Data;
 
 	hdac->CS_Port->BSRR = ((uint32_t)hdac->CS_Pin << 16U);
-
-	status = HAL_SPI_Transmit(hdac->hspi,tx_buff, 3U, HAL_MAX_DELAY);
+	delay_us(1);
+	status = HAL_SPI_Transmit(hdac->hspi, tx_buff, 3U, HAL_MAX_DELAY);
+	delay_us(1);
 
 	hdac->CS_Port->BSRR = ((uint32_t)hdac->CS_Pin);
 
@@ -150,9 +152,9 @@ static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac,DAC80501M_R
  * @retval HAL_BUSY     The SPI peripheral is currently busy.
  * @retval HAL_TIMEOUT  The SPI transmission timed out.
  */
-HAL_StatusTypeDef DAC80501M_SPI_Write_DAC(DAC80501M_Handle_t *hdac,uint16_t Data)
+HAL_StatusTypeDef DAC80501M_SPI_Write_DAC (DAC80501M_Handle_t * hdac, uint16_t Data)
 {
-	if(hdac == NULL || hdac->hspi == NULL || hdac->CS_Port == NULL)
+	if((hdac == NULL) || (hdac->hspi == NULL) || (hdac->CS_Port == NULL))
 	{
 		return HAL_ERROR;
 	}
@@ -172,12 +174,12 @@ HAL_StatusTypeDef DAC80501M_SPI_Write_DAC(DAC80501M_Handle_t *hdac,uint16_t Data
  * @retval HAL_BUSY     The SPI peripheral is currently busy.
  * @retval HAL_TIMEOUT  The SPI transmission timed out.
  */
-HAL_StatusTypeDef DAC80501M_Trigger_LADC(DAC80501M_Handle_t *hdac)
+HAL_StatusTypeDef DAC80501M_Trigger_LADC (DAC80501M_Handle_t * hdac)
 {
-	if(hdac == NULL || hdac->hspi == NULL || hdac->CS_Port == NULL)
+	if((hdac == NULL) || (hdac->hspi == NULL) || (hdac->CS_Port == NULL))
 	{
 		return HAL_ERROR;
 	}
-	uint16_t trgg = __DAC80501_TRIGGER_LDAC << __DAC80501M_TRIGGER_LDAC_POS;
+	uint16_t trgg = (__DAC80501_TRIGGER_LDAC << __DAC80501M_TRIGGER_LDAC_POS);
 	return DAC80501M_WriteReg(hdac, DAC80501M_REG_TRIGGER, trgg);
 }

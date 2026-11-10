@@ -5,7 +5,7 @@
  */
 #include "DAC80501M_I2C.h"
 
-static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac, DAC80501M_Register_t Reg, uint16_t Data);
+static HAL_StatusTypeDef DAC80501M_WriteReg (DAC80501M_Handle_t * hdac, DAC80501M_Register_t Reg, uint16_t Data);
 /**
  * @brief  Initializes the DAC80501M device over I2C based on the handle configuration.
  * @details Validates handle pointers and initialization parameters, configures
@@ -21,40 +21,40 @@ static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac, DAC80501M_
  * @retval 0x99      A reference alarm is active (headroom violation or reference fault),
  *                   or a communication failure occurred while polling the alarm status.
  */
-HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
+HAL_StatusTypeDef DAC80501M_Init (DAC80501M_Handle_t * hdac)
 {
-	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
-	{
+    if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
+    {
 		return HAL_ERROR;
 	}
-	if(hdac->Init.int_ref > DAC80501M_INT_REF_DI || hdac->Init.dac_sync > DAC80501M_SYNC_EN)
+	if (hdac->Init.int_ref > DAC80501M_INT_REF_DI || hdac->Init.dac_sync > DAC80501M_SYNC_EN)
 	{
 		return HAL_ERROR;
 	}
 
 	HAL_StatusTypeDef status;
 	uint16_t cfg_reg = 0;
-	if(hdac->Init.dac_sync == DAC80501M_SYNC_EN)
+	if (hdac->Init.dac_sync == DAC80501M_SYNC_EN)
 	{
 		cfg_reg |= (uint16_t)(0x01U << __DAC80501M_SYNC_EN_POS);
 	}
-	status = DAC80501M_WriteReg(hdac,DAC80501M_REG_SYNC, cfg_reg);
-	if(status != HAL_OK)
+	status = DAC80501M_WriteReg(hdac, DAC80501M_REG_SYNC, cfg_reg);
+	if (status != HAL_OK)
 	{
 		return status;
 	}
 
 	cfg_reg = 0;
-	if(hdac->Init.int_ref == DAC80501M_INT_REF_DI)
+	if (hdac->Init.int_ref == DAC80501M_INT_REF_DI)
 	{
 		cfg_reg |= (uint16_t)(0x01U << __DAC80501M_REF_PWDWN_POS);
 	}
-	status = DAC80501M_WriteReg(hdac,DAC80501M_REG_CONFIG, cfg_reg);
-	if(status != HAL_OK)
+	status = DAC80501M_WriteReg(hdac, DAC80501M_REG_CONFIG, cfg_reg);
+	if (status != HAL_OK)
 	{
 		return status;
 	}
-	if(DAC80501M_Get_Ref_Alarm(hdac) == 1U || DAC80501M_Get_Ref_Alarm(hdac) == 0x99U)
+	if (DAC80501M_Get_Ref_Alarm(hdac) == (1U || 0x99U))
 	{
 		return 0x99U;
 	}
@@ -85,16 +85,14 @@ HAL_StatusTypeDef DAC80501M_Init(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C transmission timed out.
  */
-static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac, DAC80501M_Register_t Reg, uint16_t Data)
+static HAL_StatusTypeDef DAC80501M_WriteReg (DAC80501M_Handle_t * hdac, DAC80501M_Register_t Reg, uint16_t Data)
 {
-	if(hdac == NULL ||
-			hdac->hi2c == NULL ||
-			hdac->Init.dev_i2c_addr == 0)
+	if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
 	{
 		return HAL_ERROR;
 	}
 	uint8_t tx_buff[2];
-	tx_buff[0] = (uint8_t)(Data>>8U);
+	tx_buff[0] = (uint8_t)(Data >> 8U);
 	tx_buff[1] = (uint8_t)Data;
 	return HAL_I2C_Mem_Write(hdac->hi2c, hdac->Init.dev_i2c_addr, Reg, 1U, tx_buff, 2U, 1000);
 }
@@ -117,21 +115,21 @@ static HAL_StatusTypeDef DAC80501M_WriteReg(DAC80501M_Handle_t *hdac, DAC80501M_
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C read operation timed out.
  */
-HAL_StatusTypeDef DAC80501M_ReadReg(DAC80501M_Handle_t *hdac, DAC80501M_Register_t Reg, uint16_t *pData)
+HAL_StatusTypeDef DAC80501M_ReadReg (DAC80501M_Handle_t * hdac, DAC80501M_Register_t Reg, uint16_t * pData)
 {
-	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0 || pData == NULL)
+	if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0 || pData == NULL)
 	{
 		return HAL_ERROR;
 	}
 	HAL_StatusTypeDef status;
 	uint8_t rx_buff[2];
-	status = HAL_I2C_Mem_Read(hdac->hi2c,hdac->Init.dev_i2c_addr,Reg,1U,rx_buff,2U, HAL_MAX_DELAY);
-	if(status != HAL_OK)
+	status = HAL_I2C_Mem_Read(hdac->hi2c, hdac->Init.dev_i2c_addr, Reg, 1U, rx_buff, 2U, HAL_MAX_DELAY);
+	if (status != HAL_OK)
 	{
 		return status;
 	}
 
-	*pData = ((uint16_t)rx_buff[0] << 8U | (uint16_t)rx_buff[1]);
+	*pData = (((uint16_t)rx_buff[0] << 8U) | (uint16_t)rx_buff[1]);
 
 	return status;
 }
@@ -148,16 +146,16 @@ HAL_StatusTypeDef DAC80501M_ReadReg(DAC80501M_Handle_t *hdac, DAC80501M_Register
  * @retval 0x99   Input validation failed (NULL pointer or zero I2C address) or
  *                an I2C communication error occurred while reading the register.
  */
-uint8_t DAC80501M_Get_Ref_Alarm(DAC80501M_Handle_t *hdac)
+uint8_t DAC80501M_Get_Ref_Alarm (DAC80501M_Handle_t * hdac)
 {
-	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
+	if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
 	{
 		return 0x99U;
 	}
 	HAL_StatusTypeDef status;
 	uint16_t data;
 	status = DAC80501M_ReadReg(hdac, DAC80501M_REG_STATUS, &data);
-	if(status != HAL_OK)
+	if (status != HAL_OK)
 	{
 		return 0x99U;
 	}
@@ -178,15 +176,15 @@ uint8_t DAC80501M_Get_Ref_Alarm(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C transmission timed out.
  */
-HAL_StatusTypeDef DAC80501M_Soft_Reset(DAC80501M_Handle_t *hdac)
+HAL_StatusTypeDef DAC80501M_Soft_Reset (DAC80501M_Handle_t * hdac)
 {
-	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
+	if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
 	{
 		return HAL_ERROR;
 	}
-	uint16_t tx = __DAC80501_TRIGGER_SOFTWARE_RESET << __DAC80501M_SOFTRESET_POS;
+	uint16_t tx = (__DAC80501_TRIGGER_SOFTWARE_RESET << __DAC80501M_SOFTRESET_POS);
 
-	return DAC80501M_WriteReg(hdac, DAC80501M_REG_TRIGGER,tx);
+	return DAC80501M_WriteReg(hdac, DAC80501M_REG_TRIGGER, tx);
 }
 /**
  * @brief  Configures the internal output buffer gain of the DAC80501M over I2C.
@@ -207,21 +205,20 @@ HAL_StatusTypeDef DAC80501M_Soft_Reset(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C read or write operation timed out.
  */
-HAL_StatusTypeDef DAC80501M_Set_Buff_Gain(DAC80501M_Handle_t *hdac, uint8_t Dac80501_Buff_Gain)
+HAL_StatusTypeDef DAC80501M_Set_Buff_Gain (DAC80501M_Handle_t * hdac, uint8_t Dac80501_Buff_Gain)
 {
-	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0 || Dac80501_Buff_Gain > DAC80501M_BUFF_GAIN_2)
+	if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0 || Dac80501_Buff_Gain > DAC80501M_BUFF_GAIN_2)
 	{
 		return HAL_ERROR;
 	}
 	HAL_StatusTypeDef status;
 	uint16_t config = 0;
-
 	status = DAC80501M_ReadReg(hdac, DAC80501M_REG_GAIN, &config);
-	if(status != HAL_OK)
+	if (status != HAL_OK)
 	{
 		return status;
 	}
-	if(Dac80501_Buff_Gain == DAC80501M_BUFF_GAIN_1)
+	if (Dac80501_Buff_Gain == DAC80501M_BUFF_GAIN_1)
 	{
 		config &= ~(0x1U << __DAC80501M_BUFF_GAIN_POS);
 	}
@@ -253,21 +250,20 @@ HAL_StatusTypeDef DAC80501M_Set_Buff_Gain(DAC80501M_Handle_t *hdac, uint8_t Dac8
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C read or write operation timed out.
  */
-HAL_StatusTypeDef DAC80501M_Set_Ref_Div(DAC80501M_Handle_t *hdac, uint8_t Dac80501_Ref_Div)
+HAL_StatusTypeDef DAC80501M_Set_Ref_Div (DAC80501M_Handle_t * hdac, uint8_t Dac80501_Ref_Div)
 {
-	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0 || Dac80501_Ref_Div > DAC80501M_REF_DIV_2)
+	if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0 || Dac80501_Ref_Div > DAC80501M_REF_DIV_2)
 	{
 		return HAL_ERROR;
 	}
 	HAL_StatusTypeDef status;
 	uint16_t config = 0;
-
 	status = DAC80501M_ReadReg(hdac, DAC80501M_REG_GAIN, &config);
-	if(status != HAL_OK)
+	if (status != HAL_OK)
 	{
 		return status;
 	}
-	if(Dac80501_Ref_Div == DAC80501M_REF_DIV_2)
+	if (Dac80501_Ref_Div == DAC80501M_REF_DIV_2)
 	{
 		config |= (0x1U << __DAC80501M_REF_DIV_POS);
 	}
@@ -294,7 +290,7 @@ HAL_StatusTypeDef DAC80501M_Set_Ref_Div(DAC80501M_Handle_t *hdac, uint8_t Dac805
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C write operation timed out.
  */
-HAL_StatusTypeDef DAC80501M_Trigger_LADC(DAC80501M_Handle_t *hdac)
+HAL_StatusTypeDef DAC80501M_Trigger_LADC (DAC80501M_Handle_t * hdac)
 {
 	uint16_t trgg = __DAC80501_TRIGGER_LDAC << __DAC80501M_LDAC_POS;
 
@@ -317,14 +313,14 @@ HAL_StatusTypeDef DAC80501M_Trigger_LADC(DAC80501M_Handle_t *hdac)
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C transmission timed out.
  */
-HAL_StatusTypeDef DAC80501M_I2C_Write_DAC(DAC80501M_Handle_t *hdac, uint16_t Data)
+HAL_StatusTypeDef DAC80501M_I2C_Write_DAC (DAC80501M_Handle_t * hdac, uint16_t Data)
 {
-	if(hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
+	if (hdac == NULL || hdac->hi2c == NULL || hdac->Init.dev_i2c_addr == 0)
 	{
 		return HAL_ERROR;
 	}
 	uint8_t tx_buff[2];
-	tx_buff[0] = (uint8_t)(Data>>8U);
+	tx_buff[0] = (uint8_t)(Data >> 8U);
 	tx_buff[1] = (uint8_t)Data;
 	return HAL_I2C_Mem_Write(hdac->hi2c, hdac->Init.dev_i2c_addr, DAC80501M_REG_DAC_DATA, 1U, tx_buff, 2U, HAL_MAX_DELAY);
 }

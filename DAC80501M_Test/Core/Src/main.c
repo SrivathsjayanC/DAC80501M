@@ -47,8 +47,11 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi2;
 
+TIM_HandleTypeDef htim6;
+
 /* USER CODE BEGIN PV */
 DAC80501M_Handle_t DACs;
+uint8_t count = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,6 +59,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -96,21 +100,28 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_SPI2_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   /* I2C
    */
-  DACs.hi2c = &hi2c1;
-  DACs.Init.dev_i2c_addr = (0x48U << 1U);
-//  DACs.hspi = &hspi2;
-//  DACs.CS_Port = GPIOB;
-//  DACs.CS_Pin = GPIO_PIN_14;
+//  DACs.hi2c = &hi2c1;
+//  DACs.Init.dev_i2c_addr = (0x49U << 1U);
+  HAL_TIM_Base_Start(&htim6);
+
+  DACs.hspi = &hspi2;
+  DACs.CS_Port = GPIOB;
+  DACs.CS_Pin = GPIO_PIN_14;
   DACs.Init.dac_sync = DAC80501M_SYNC_DI;
   DACs.Init.int_ref = DAC80501M_INT_REF_EN;
+//  DACs.Init.buff_gain = DAC80501M_BUFF_GAIN_2;
+//  DACs.Init.ref_div = DAC80501M_REF_DIV_1;
 
-  DAC80501M_Init(&DACs);
-  uint16_t data = 0x1234;
+//  DAC80501M_Init(&DACs);
+//  DAC80501M_Set_Ref_Div(&DACs, DAC80501M_REF_DIV_2);
+//  DAC80501M_Set_Buff_Gain(&DACs, DAC80501M_BUFF_GAIN_2);
+  uint16_t data = 0x7FFF;
   uint16_t pData;
-  DAC80501M_ReadReg(&DACs, DAC80501M_REG_DAC_DATA,&pData);
+//  DAC80501M_ReadReg(&DACs, DAC80501M_REG_DAC_DATA,&pData);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,11 +133,22 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	 if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))
 	 {
-		 //DAC80501M_SPI_Write_DAC(&DACs, data);
+		 HAL_Delay(100);
+		 if(count < 2)
+		 {
+//			 DAC80501M_I2C_Write_DAC(&DACs, data);
+			 DAC80501M_SPI_Write_DAC(&DACs, data);
+		 }
+		 else if(count>2)
+		 {
+			 data = 0xFFFF;
+//			 DAC80501M_I2C_Write_DAC(&DACs, data);
+			 DAC80501M_SPI_Write_DAC(&DACs, data);
+		 }
+		 count++;
 		 /* I2C
 		  */
-		 HAL_Delay(100);
-		 DAC80501M_I2C_Write_DAC(&DACs, data);
+//		 HAL_Delay(100);
 	 }
   }
   /* USER CODE END 3 */
@@ -263,6 +285,44 @@ static void MX_SPI2_Init(void)
   /* USER CODE BEGIN SPI2_Init 2 */
 
   /* USER CODE END SPI2_Init 2 */
+
+}
+
+/**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 169;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 65535;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
 
 }
 
